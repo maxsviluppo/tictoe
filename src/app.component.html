@@ -1,0 +1,238 @@
+<div class="min-h-screen w-full flex flex-col items-center justify-center relative overflow-hidden bg-gradient-to-br from-slate-900 via-purple-950 to-slate-900 text-white selection:bg-purple-500 selection:text-white">
+  
+  <!-- Ambient Background Effects -->
+  <div class="absolute inset-0 z-0 pointer-events-none opacity-40">
+    <div class="absolute top-0 left-0 w-96 h-96 bg-blue-600 rounded-full mix-blend-screen filter blur-[120px] animate-pulse"></div>
+    <div class="absolute bottom-0 right-0 w-96 h-96 bg-purple-600 rounded-full mix-blend-screen filter blur-[120px] animate-pulse" style="animation-delay: 2s;"></div>
+  </div>
+
+  <!-- Audio Toggle (Top Right) -->
+  <button (click)="toggleSound()" 
+          class="absolute top-4 right-4 z-50 p-2 rounded-full bg-white/10 hover:bg-white/20 transition-colors backdrop-blur-sm"
+          [title]="isMuted() ? 'Attiva Audio' : 'Disattiva Audio'">
+    @if (isMuted()) {
+      <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z" />
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2" />
+      </svg>
+    } @else {
+      <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-blue-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z" />
+      </svg>
+    }
+  </button>
+
+  @if (gameMode() === null) {
+    <!-- MAIN MENU -->
+    <div class="z-20 flex flex-col items-center animate-fade-in p-8 rounded-3xl bg-slate-800/40 backdrop-blur-xl border border-white/10 shadow-2xl neon-box max-w-sm w-full mx-4">
+      <h1 class="text-5xl font-black mb-2 text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-purple-400 text-center drop-shadow-lg leading-tight">
+        TRIS 3D
+      </h1>
+      <p class="text-slate-300 text-sm tracking-widest uppercase mb-10 text-center">Scegli la modalità</p>
+
+      <div class="flex flex-col gap-4 w-full">
+        <button (click)="startGame('PVE')" 
+                class="group relative w-full py-4 px-6 rounded-xl bg-gradient-to-r from-blue-600 to-blue-500 hover:from-blue-500 hover:to-blue-400 transition-all duration-300 transform hover:-translate-y-1 hover:shadow-lg hover:shadow-blue-500/30 overflow-hidden">
+          <div class="absolute inset-0 bg-white/20 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700 ease-in-out"></div>
+          <div class="flex items-center justify-center gap-3">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+            </svg>
+            <span class="font-bold text-lg">Giocatore vs AI</span>
+          </div>
+          <p class="text-xs text-blue-100/80 mt-1">Sfida Gemini Flash</p>
+        </button>
+
+        <button (click)="startGame('PVP')" 
+                class="group relative w-full py-4 px-6 rounded-xl bg-slate-700 hover:bg-slate-600 border border-slate-600 hover:border-slate-500 transition-all duration-300 transform hover:-translate-y-1 hover:shadow-lg overflow-hidden">
+          <div class="flex items-center justify-center gap-3">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-purple-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
+            </svg>
+            <span class="font-bold text-lg">2 Giocatori</span>
+          </div>
+          <p class="text-xs text-slate-400 mt-1">Sfida un amico in locale</p>
+        </button>
+      </div>
+    </div>
+
+  } @else {
+    <!-- GAME HUD & BOARD -->
+    
+    <!-- HUD / Header -->
+    <div class="z-10 w-full max-w-4xl px-6 flex flex-col md:flex-row justify-between items-center mb-6 animate-fade-in">
+      <div class="flex flex-col items-center md:items-start mb-4 md:mb-0">
+        <h1 class="text-3xl font-bold tracking-wider text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-purple-400">
+          TRIS 3D
+        </h1>
+        <button (click)="returnToMenu()" class="text-xs text-slate-400 hover:text-white transition-colors flex items-center gap-1 mt-1">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+          </svg>
+          Menu Principale
+        </button>
+      </div>
+
+      <!-- Score Board -->
+      <div class="flex gap-8 bg-white/5 backdrop-blur-md px-6 py-3 rounded-2xl border border-white/10 shadow-2xl">
+        <div class="flex flex-col items-center">
+          <span class="text-xs text-blue-300 font-bold uppercase tracking-wider">
+            {{ gameMode() === 'PVE' ? 'Tu (X)' : 'G1 (X)' }}
+          </span>
+          <span class="text-2xl font-black text-blue-400 neon-text-blue">{{ scoreX() }}</span>
+        </div>
+        <div class="w-px bg-white/10"></div>
+        <div class="flex flex-col items-center">
+          <span class="text-xs text-red-300 font-bold uppercase tracking-wider">
+            {{ gameMode() === 'PVE' ? 'Gemini (O)' : 'G2 (O)' }}
+          </span>
+          <span class="text-2xl font-black text-red-400 neon-text-red">{{ scoreO() }}</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Status Indicator -->
+    <div class="z-10 mb-6 h-8 animate-fade-in">
+      <div class="px-4 py-1 rounded-full bg-slate-800/80 border border-slate-700 backdrop-blur-sm text-sm font-medium tracking-wide transition-all duration-300"
+          [class.text-blue-400]="isPlayerTurn() && !winner() && !isDraw()"
+          [class.text-red-400]="!isPlayerTurn() && !winner() && !isDraw()"
+          [class.text-green-400]="winner()"
+          [class.text-yellow-400]="isDraw()">
+        {{ statusMessage() }}
+      </div>
+    </div>
+
+    <!-- 3D Scene Container -->
+    <div class="relative w-[340px] h-[340px] sm:w-[450px] sm:h-[450px] perspective-1000 z-10 group animate-fade-in">
+      
+      <!-- The Rotating Board -->
+      <div class="w-full h-full preserve-3d transition-transform duration-700 ease-out transform rotate-x-12">
+        
+        <!-- Grid Container -->
+        <div class="grid grid-cols-3 grid-rows-3 gap-3 sm:gap-4 w-full h-full p-4 bg-slate-800/30 backdrop-blur-sm rounded-xl border border-white/10 shadow-2xl neon-box preserve-3d">
+          
+          <!-- Cells -->
+          @for (cell of board(); track $index) {
+            <div class="relative w-full h-full preserve-3d cursor-pointer" 
+                (click)="handleCellClick($index)">
+              
+              <!-- The Flipper Container -->
+              <div class="w-full h-full relative transition-transform duration-700 ease-[cubic-bezier(0.34,1.56,0.64,1)] preserve-3d shadow-lg rounded-lg"
+                  [class.rotate-y-180]="cell !== ''"
+                  [class.animate-breathe]="isThinking() && cell === ''"
+                  [class.ring-4]="winningLine().includes($index)"
+                  [class.ring-green-400]="winningLine().includes($index)"
+                  [class.shadow-[0_0_20px_rgba(74,222,128,0.6)]]="winningLine().includes($index)">
+                
+                <!-- Front Face (Empty) -->
+                <div class="absolute inset-0 w-full h-full bg-slate-800/80 border border-slate-600/50 rounded-lg flex items-center justify-center backface-hidden hover:bg-slate-700/80 transition-colors">
+                  <!-- Subtle grid marker or pattern -->
+                  <div class="w-2 h-2 rounded-full bg-slate-600/30 transition-all duration-300"
+                      [class.bg-blue-400]="isPlayerTurn() && !isThinking()"
+                      [class.bg-red-400]="!isPlayerTurn() && !isThinking() && gameMode() === 'PVP'"
+                      [class.scale-150]="!isThinking()"></div>
+                </div>
+
+                <!-- Back Face (Content X or O) -->
+                <div class="absolute inset-0 w-full h-full bg-slate-900/90 border border-slate-500/30 rounded-lg flex items-center justify-center backface-hidden rotate-y-180 shadow-inner">
+                  
+                  @if (cell === 'X') {
+                    <svg viewBox="0 0 100 100" class="w-2/3 h-2/3 drop-shadow-[0_0_8px_rgba(59,130,246,0.8)] animate-pop">
+                      <line x1="20" y1="20" x2="80" y2="80" stroke="#3b82f6" stroke-width="12" stroke-linecap="round" />
+                      <line x1="80" y1="20" x2="20" y2="80" stroke="#3b82f6" stroke-width="12" stroke-linecap="round" />
+                    </svg>
+                  } @else if (cell === 'O') {
+                    <svg viewBox="0 0 100 100" class="w-2/3 h-2/3 drop-shadow-[0_0_8px_rgba(239,68,68,0.8)] animate-pop">
+                      <circle cx="50" cy="50" r="35" stroke="#ef4444" stroke-width="12" fill="none" stroke-linecap="round" />
+                    </svg>
+                  }
+
+                </div>
+              </div>
+
+              <!-- Floor Reflection -->
+              <div class="absolute -bottom-8 left-2 right-2 h-4 bg-black/40 blur-md rounded-[100%] transform scale-x-75 opacity-0 transition-opacity duration-700 delay-300"
+                  [class.opacity-100]="cell !== ''"></div>
+
+            </div>
+          }
+        </div>
+      </div>
+    </div>
+
+    <!-- Game Over Overlay -->
+    @if (winner() || isDraw()) {
+      <div class="absolute inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm animate-fade-in">
+        <div class="bg-slate-900 border border-slate-700 p-8 rounded-2xl shadow-2xl flex flex-col items-center transform scale-100 animate-bounce-in max-w-sm mx-4 text-center">
+          <h2 class="text-3xl font-bold mb-2 text-white">
+            @if (winner()) {
+              <span class="neon-text-blue" [class.neon-text-red]="winner() === 'O'">
+                @if (gameMode() === 'PVE') {
+                  {{ winner() === 'X' ? 'Vittoria!' : 'Sconfitta!' }}
+                } @else {
+                  Vince {{ winner() === 'X' ? 'Giocatore 1' : 'Giocatore 2' }}!
+                }
+              </span>
+            } @else {
+              <span class="text-yellow-400">Pareggio</span>
+            }
+          </h2>
+          
+          <div class="flex flex-col gap-3 w-full mt-6">
+            <button (click)="resetGame()" 
+                    class="px-8 py-3 bg-gradient-to-r from-blue-600 to-blue-500 hover:from-blue-500 hover:to-blue-400 text-white font-bold rounded-lg shadow-lg hover:shadow-blue-500/30 transition-all transform hover:-translate-y-0.5 active:translate-y-0 w-full">
+              Gioca Ancora
+            </button>
+            <button (click)="returnToMenu()" 
+                    class="px-8 py-3 bg-slate-700 hover:bg-slate-600 text-white font-bold rounded-lg border border-slate-600 transition-colors w-full">
+              Cambia Modalità
+            </button>
+          </div>
+        </div>
+      </div>
+    }
+  }
+
+  <!-- Footer -->
+  <div class="absolute bottom-4 text-xs text-slate-500 z-10">
+    Powered by Gemini AI • Angular • Tailwind
+  </div>
+
+</div>
+
+<!-- CSS stays same as before -->
+<style>
+  @keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+  .animate-fade-in {
+    animation: fadeIn 0.3s ease-out forwards;
+  }
+  
+  @keyframes bounceIn {
+    0% { transform: scale(0.8); opacity: 0; }
+    70% { transform: scale(1.05); opacity: 1; }
+    100% { transform: scale(1); opacity: 1; }
+  }
+  .animate-bounce-in {
+    animation: bounceIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+  }
+
+  .animate-breathe {
+    animation: breathe 1.5s infinite ease-in-out;
+  }
+  @keyframes breathe {
+    0%, 100% { transform: translateZ(0); filter: brightness(1); border-color: rgba(71, 85, 105, 0.5); }
+    50% { transform: translateZ(8px); filter: brightness(1.2); border-color: rgba(59, 130, 246, 0.4); }
+  }
+
+  .animate-pop {
+    animation: pop 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+    transform-origin: center;
+  }
+  @keyframes pop {
+    0% { transform: scale(0) rotate(-15deg); opacity: 0; }
+    100% { transform: scale(1) rotate(0); opacity: 1; }
+  }
+</style>

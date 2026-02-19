@@ -1,0 +1,5 @@
+{
+  "name": "Tris 3D (Tic Tac Toe)",
+  "description": "Un gioco del Tris in 3D immersivo con celle girevoli e avversario AI intelligente powered by Gemini.",
+  "requestFramePermissions": []
+}
